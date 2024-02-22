@@ -11,17 +11,19 @@ function clear() {
 }
 
 function check_letters($word, $letter, &$discovered_letters) {
-    $offset = 0;
+    // Esta función busca letras en la palabra y actualiza las letras descubiertas.
     $found = false;
-    while (($letter_position = strpos($word, $letter, $offset)) !== false) {
-        $discovered_letters[$letter_position] = $letter;
-        $offset = $letter_position + 1;
-        $found = true;
+    for ($i = 0; $i < strlen($word); $i++) {
+        if ($word[$i] === $letter) {
+            $discovered_letters[$i] = $letter;
+            $found = true;
+        }
     }
     return $found;
 }
 
 function print_wrong_letter(&$attempts) {
+    // Incrementa los intentos y muestra los intentos restantes.
     clear();
     $attempts++;
     echo "Letra incorrecta 😾. Te quedan " . (MAX_ATTEMPTS - $attempts) . " intentos.\n";
@@ -29,6 +31,7 @@ function print_wrong_letter(&$attempts) {
 }
 
 function print_man($attempts) {
+    // Muestra el estado del ahorcado basado en el número de intentos fallidos.
     echo "\n";
     switch ($attempts) {
         case 0:
@@ -95,11 +98,10 @@ function print_man($attempts) {
             echo "=========\n";
             break;
     }
-
-    echo "\n\n";
 }
 
 function print_game($word_length, $discovered_letters, $attempts) {
+    // Limpia la pantalla y muestra el estado actual del juego, incluyendo el ahorcado.
     clear();
     print_man($attempts);
     echo "Palabra de $word_length letras: \n\n";
@@ -107,9 +109,11 @@ function print_game($word_length, $discovered_letters, $attempts) {
 }
 
 function end_game($win, $choosen_word, $discovered_letters, $attempts) {
+    // Muestra el resultado del juego y, si se ganó, cuántos intentos quedaron.
     clear();
     if ($win) {
         echo "¡Felicidades! Has adivinado la palabra. 😸 \n\n";
+        // R1: Muestra cuántos intentos quedaron al ganar.
         echo "Te quedaron " . (MAX_ATTEMPTS - $attempts) . " intentos.\n";
     } else {
         echo "Suerte para la próxima, amigo. 😿 \n\n";
@@ -120,19 +124,20 @@ function end_game($win, $choosen_word, $discovered_letters, $attempts) {
 }
 
 function game_loop() {
+    // Esta función encapsula la lógica del juego, permitiendo reiniciar fácilmente.
     $possible_words = ["bebida", "prisma", "ala", "dolor", "piloto", "baldosa", "terremoto", "asteroide", "gallo", "platzi"];
     $choosen_word = $possible_words[array_rand($possible_words)];
     $word_length = strlen($choosen_word);
     $discovered_letters = str_pad("", $word_length, "_");
     $attempts = 0;
 
-    while ($attempts < MAX_ATTEMPTS && $discovered_letters != $choosen_word) {
+    do {
         print_game($word_length, $discovered_letters, $attempts);
         $player_letter = strtolower(readline("Escribe una letra: "));
         if (!check_letters($choosen_word, $player_letter, $discovered_letters)) {
             print_wrong_letter($attempts);
         }
-    }
+    } while ($attempts < MAX_ATTEMPTS && $discovered_letters != $choosen_word);
 
     end_game($discovered_letters == $choosen_word, $choosen_word, $discovered_letters, $attempts);
 }
@@ -140,5 +145,6 @@ function game_loop() {
 // Juego principal
 do {
     game_loop();
+    // R2: Pregunta si se quiere jugar de nuevo y reinicia el juego si es afirmativo.
     $play_again = strtolower(readline("¿Quieres jugar de nuevo? (s/n): "));
 } while ($play_again == "s");
